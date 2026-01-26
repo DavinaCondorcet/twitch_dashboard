@@ -22,7 +22,7 @@ CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:cs
 @st.cache_data(ttl=300)  # auto-refresh every 5 min
 def load_data():
     df = pd.read_csv(CSV_URL)
-    df["date"] = pd.to_datetime(df["date"])
+    df["date"] = pd.to_datetime(df["date"], dayfirst=True)
     df["raid"] = df["raid"].astype(str).str.lower().isin(["true", "yes", "1"])
     return df.sort_values("date")
 
