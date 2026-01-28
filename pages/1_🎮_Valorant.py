@@ -1,7 +1,7 @@
 import streamlit as st
-from valorant.database import init_db
-from valorant.updater import update_matches, update_rank
-from valorant.plots import kda_over_time, winrate_by_agent
+from ..valorant.database import init_db
+from ..valorant.updater import update_matches, update_rank
+from ..valorant.plots import kda_over_time, winrate_by_agent
 
 RIOT_ID = "YukiBloo"
 TAG = "EUW"
