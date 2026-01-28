@@ -1,7 +1,7 @@
 import requests
 from datetime import datetime
 
-API_KEY = "TON_API_KEY"
+API_KEY = "eb225e5d-1a95-4143-a3a0-7c0ae7529215"
 BASE_URL = "https://public-api.tracker.gg/v2/valorant/standard"
 
 HEADERS = {
