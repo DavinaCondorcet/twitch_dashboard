@@ -1,4 +1,4 @@
-from tracker_api import fetch_matches, fetch_profile
+from .tracker_api import fetch_matches, fetch_profile
 from database import get_connection
 from datetime import datetime
 
