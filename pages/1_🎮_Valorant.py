@@ -1,14 +1,22 @@
-import streamlit as st
-from ..valorant.database import init_db
-from ..valorant.updater import update_matches, update_rank
-from ..valorant.plots import kda_over_time, winrate_by_agent
+import sys
+from pathlib import Path
+
+# ajoute le dossier racine au PYTHONPATH
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+# maintenant les imports absolus depuis la racine fonctionnent
+from valorant.database import init_db
+from valorant.updater import update_matches, update_rank
+
+# test
+init_db()
+update_matches()
+update_rank()
 
 RIOT_ID = "YukiBloo"
 TAG = "EUW"
 
 st.title("🎮 Valorant Tracker")
-
-init_db()
 
 with st.spinner("Sync Valorant data…"):
     update_matches(RIOT_ID, TAG)
