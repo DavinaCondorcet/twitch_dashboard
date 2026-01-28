@@ -1,13 +1,73 @@
 import streamlit as st
-from twitch.database import init_db
-from twitch.updater import update_streams
-from twitch.plots import viewers_over_time
+import pandas as pd
 
-st.title("📺 Twitch Analytics")
+from twitch.data_loader import load_twitch_data
+from twitch.plots import (
+    evolution_viewers,
+    tendance_viewers,
+    viewers_par_jour,
+    impact_raids
+)
 
-init_db()
+st.set_page_config(page_title="Twitch Analytics", layout="wide")
+st.title("📺 Dashboard Twitch")
 
-with st.spinner("Sync Twitch data…"):
-    update_streams()
+df = load_twitch_data()
 
-st.plotly_chart(viewers_over_time(), use_container_width=True)
+# ======================
+# SIDEBAR – FILTRES
+# ======================
+st.sidebar.header("🎛️ Filtres")
+
+periode = st.sidebar.date_input(
+    "Période",
+    value=(df["date"].min(), df["date"].max())
+)
+
+if not isinstance(periode, tuple) or len(periode) != 2:
+    st.stop()
+
+date_debut, date_fin = periode
+
+raid_only = st.sidebar.checkbox("Streams avec raid uniquement")
+
+# ======================
+# FILTRAGE
+# ======================
+filtre = df[
+    (df["date"] >= pd.to_datetime(date_debut)) &
+    (df["date"] <= pd.to_datetime(date_fin))
+]
+
+if raid_only:
+    filtre = filtre[filtre["raid"]]
+
+# ======================
+# KPI
+# ======================
+col1, col2, col3, col4 = st.columns(4)
+
+col1.metric("📺 Streams", len(filtre))
+col2.metric("👥 Avg viewers", round(filtre["avg"].mean(), 1))
+col3.metric("🚀 Record", int(filtre["max"].max()))
+col4.metric("⚡ % raids", f"{filtre['raid'].mean() * 100:.1f}%")
+
+# ======================
+# GRAPHS
+# ======================
+st.plotly_chart(evolution_viewers(filtre), use_container_width=True)
+st.plotly_chart(tendance_viewers(filtre), use_container_width=True)
+st.plotly_chart(viewers_par_jour(filtre), use_container_width=True)
+
+fig_raid, impact = impact_raids(filtre)
+st.plotly_chart(fig_raid, use_container_width=True)
+
+# ======================
+# INSIGHT RAID
+# ======================
+if True in impact["raid"].values and False in impact["raid"].values:
+    avg_raid = impact.loc[impact["raid"], "mean"].values[0]
+    avg_no_raid = impact.loc[~impact["raid"], "mean"].values[0]
+
+    uplift = ((avg_raid - avg_no_raid) / avg_no_raid) * 100
+    st.metric("📈 Gain moyen grâce aux raids", f"{uplift:.1f} %")
