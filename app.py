@@ -125,7 +125,21 @@ st.plotly_chart(fig_tendance, use_container_width=True)
 # ======================
 # ANALYSE PAR JOUR
 # ======================
-filtre["jour_semaine"] = filtre["date"].dt.day_name(locale="fr_FR")
+jours_fr = {
+    "Monday": "Lundi",
+    "Tuesday": "Mardi",
+    "Wednesday": "Mercredi",
+    "Thursday": "Jeudi",
+    "Friday": "Vendredi",
+    "Saturday": "Samedi",
+    "Sunday": "Dimanche",
+}
+
+filtre["jour_semaine"] = (
+    filtre["date"]
+    .dt.day_name()
+    .map(jours_fr)
+)
 
 ordre_jours = [
     "lundi", "mardi", "mercredi",
